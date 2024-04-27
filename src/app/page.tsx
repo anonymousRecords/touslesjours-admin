@@ -42,17 +42,18 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen ">
       <Navbar />
-      <main className="flex gap-10 items-center justify-center flex-1">
+      <main className="flex flex-col gap-10 items-center justify-center flex-1 p-4">
         <Calendar onChange={onChange} value={value} />
-        <section className="w-400 bg-white rounded-lg p-10 shadow-sm">
-          <p>
+        <section className="w-full md:w-1/2 bg-white rounded-lg p-4 shadow-md mt-4">
+          <p className="text-lg font-semibold mb-2">
             {month}월달 주말은 총 {weekendCount}일입니다.
           </p>
           <br />
-          <div className="flex gap-10">
-            <p>{renderWorkers()}</p>
-            <div>
-              <p>작업 횟수</p>
+          <div className="flex flex-col md:flex-row md:gap-4">
+            <p className="flex-1">{renderWorkers()}</p>
+            <br />
+            <div className="flex-1">
+              <p className="font-semibold">작업 횟수</p>
               <p>1번 뚜둥이: {oneWorkermentionCounts}회</p>
               <p>2번 뚜둥이: {twoWorkermentionCounts}회</p>
               <p>3번 뚜둥이: {threeWorkermentionCounts}회</p>
