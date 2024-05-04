@@ -13,7 +13,7 @@ export type AssignedWorkers = {
 };
 
 export const personList = [
-  { id: 0, name: '1번 뚜둥이' },
-  { id: 1, name: '2번 뚜둥이' },
-  { id: 2, name: '3번 뚜둥이' },
+  { id: 0, name: '1번 뚜둥이', color: '#F59696' },
+  { id: 1, name: '2번 뚜둥이', color: '#FFD88C' },
+  { id: 2, name: '3번 뚜둥이', color: '#A8F1E4' },
 ];
