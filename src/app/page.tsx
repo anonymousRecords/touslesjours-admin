@@ -4,21 +4,32 @@ import { Navbar } from '@/components/Navbar';
 import { AssignedWorkers, Value, WeekendArray } from '@/data/type';
 import { assignWorkers } from '@/util/assignedWorkers';
 import { weekendArrayGenerator } from '@/util/weekendArrayGenerator';
-import { weekendCounter } from '@/util/weekendCounter';
 import workCounter from '@/util/workCounter';
+import { format } from 'date-fns';
+import moment from 'moment';
 
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 export default function Home() {
-  const [value, onChange] = useState<Value>(new Date());
-  // 달
-  const month = value instanceof Date ? value.getMonth() + 1 : null;
-  // 주말 카운트
-  const weekendCount = month ? weekendCounter(month) : null;
+  // 현재 날짜
+  const date = format(new Date(), 'yyyy-MM-dd');
+  const [value, onChange] = useState(date);
+
+  // 선택한 날짜
+  const selectedDate = moment(value).format('YYYY-MM-DD');
+
+  // 선택한 날짜의 달
+  const monthOfSelectedDate = Number(selectedDate.split('-')[1]);
+
+  // 달력 날짜 변경
+  const handleDateChange = (selectedDate) => {
+    onChange(selectedDate);
+  };
+
   // 주말 배열
-  const weekendArray = month ? weekendArrayGenerator(month) : null;
+  const weekendArray = monthOfSelectedDate ? weekendArrayGenerator(monthOfSelectedDate) : null;
   // 주말에 작업자 할당
   const assignedWorkers = assignWorkers(weekendArray as WeekendArray[]);
 
@@ -26,10 +37,12 @@ export default function Home() {
   const renderWorkers = () => {
     return assignedWorkers.map((assignment, index) => (
       <div key={index}>
-        <p className="font-semibold">{assignment.date}일의 담당자:</p>
-        <p>
-          {assignment.workers[0]}, {assignment.workers[1]}
-        </p>
+        <div className="font-semibold">
+          {assignment.date}일의 담당자:
+          <p>
+            {assignment.workers[0]}, {assignment.workers[1]}
+          </p>
+        </div>
       </div>
     ));
   };
@@ -43,14 +56,14 @@ export default function Home() {
     <div className="flex flex-col bg-gray-100 min-h-screen ">
       <Navbar />
       <main className="flex flex-col gap-10 items-center justify-center flex-1 p-4">
-        <Calendar onChange={onChange} value={value} />
+        <Calendar locale="ko-KR" onChange={handleDateChange} value={value} />
         <section className="w-full md:w-1/2 bg-white rounded-lg p-4 shadow-md mt-4">
           <p className="text-lg font-semibold mb-2">
-            {month}월달 주말은 총 {weekendCount}일입니다.
+            {monthOfSelectedDate}월달 주말은 총 {weekendArray?.length}일입니다.
           </p>
           <br />
           <div className="flex flex-col md:flex-row md:gap-4">
-            <p className="flex-1">{renderWorkers()}</p>
+            <div className="flex-1">{renderWorkers()}</div>
             <br />
             <div className="flex-1">
               <p className="font-semibold">작업 횟수</p>
