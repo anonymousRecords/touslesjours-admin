@@ -2,7 +2,7 @@
 import { AssignedWorkers, personList, WeekendArray } from "@/data/type";
 
 export const assignWorkers = (weekendArray: WeekendArray[]): AssignedWorkers[] => {
-  const workers = [];
+  const workers: AssignedWorkers[] = [];
   let luckyPersonId = 0;
 
   // 주말에 대해 반복
