@@ -13,7 +13,7 @@ export default function Navbar() {
       <nav className="shadow-sm  sticky top-0 left-0 z-50 bg-[#0C4630]">
         <div className="h-[80px]     w-full    flex   justify-between items-center  max-w-7xl px-3 mx-auto">
           <p className="flex items-center justify-center gap-2  ">
-            <Image src="/svg/logo.svg" alt="logo" width={200} height={50} />
+            <Image src="/svg/logo.svg" alt="logo" width={100} height={30} />
           </p>
           {/*  */}
           <section className="flex gap-2 items-center">
