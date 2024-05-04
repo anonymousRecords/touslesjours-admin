@@ -1,16 +1,16 @@
 'use client';
 
+import { format } from 'date-fns';
+import moment from 'moment';
+import { useState } from 'react';
+import Calendar from 'react-calendar';
 import { Accordian } from '@/components/Accordian';
 import { Navbar } from '@/components/Navbar';
 import { AssignedWorkers, personList, WeekendArray } from '@/data/type';
 import { assignWorkers } from '@/util/assignedWorkers';
 import { weekendArrayGenerator } from '@/util/weekendArrayGenerator';
 import workCounter from '@/util/workCounter';
-import { format } from 'date-fns';
-import moment from 'moment';
 
-import { useState } from 'react';
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 export default function Home() {
@@ -80,7 +80,7 @@ export default function Home() {
           onChange={handleDateChange}
           value={value}
           showNeighboringMonth={false}
-          tileContent={({ date, view }) => {
+          tileContent={({ date }) => {
             for (let i = 0; i < assignedWorkers.length; i++) {
               if (date.getDate() === assignedWorkers[i].date) {
                 return (

@@ -54,21 +54,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
-    '@typescript-eslint/member-ordering': [
-      'error',
-      {
-        default: [
-          'public-static-field',
-          'private-static-field',
-          'public-instance-field',
-          'private-instance-field',
-          'public-constructor',
-          'private-constructor',
-          'public-instance-method',
-          'private-instance-method',
-        ],
-      },
-    ],
 
     'import/order': [
       'error',

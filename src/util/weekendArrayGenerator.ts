@@ -11,19 +11,17 @@
 //   { date: 28, person: ['', ''] }
 // ] 을 반환한다.
 
-import { WeekendArray } from "@/data/type";
+import { WeekendArray } from '@/data/type';
 
 export const weekendArrayGenerator = (month: number): WeekendArray[] => {
   const date = new Date();
   date.setMonth(month);
   date.setDate(0);
   const lastDay = date.getDate();
-  let count = 0;
   const weekendArray: WeekendArray[] = [];
   for (let i = 1; i <= lastDay; i++) {
     date.setDate(i);
     if (date.getDay() === 0 || date.getDay() === 6) {
-      count++;
       weekendArray.push({ date: i, person: ['', ''] });
     }
   }
