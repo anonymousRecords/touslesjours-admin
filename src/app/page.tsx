@@ -5,6 +5,8 @@ import moment from 'moment';
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import { Accordian } from '@/components/Accordian';
+import { Dropdown } from '@/components/Dropdown';
+import { Modal } from '@/components/Modal';
 import { Navbar } from '@/components/Navbar';
 import { AssignedWorkers, personList, WeekendArray } from '@/data/type';
 import { assignWorkers } from '@/util/assignedWorkers';
@@ -13,7 +15,10 @@ import workCounter from '@/util/workCounter';
 
 import 'react-calendar/dist/Calendar.css';
 
+const dropdownContents = ['1번 뚜둥이', '2번 뚜둥이', '3번 뚜둥이'];
+
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // TO DO: 코드 중복 제거 필요
   const [isAccordianOpen1, setIsAccordianOpen1] = useState(false);
   const [isAccordianOpen2, setIsAccordianOpen2] = useState(false);
@@ -40,10 +45,13 @@ export default function Home() {
 
   // 선택한 날짜의 달
   const monthOfSelectedDate = Number(selectedDate.split('-')[1]);
+  const dateofSelectedDate = Number(selectedDate.split('-')[2]);
 
-  // 달력 날짜 변경
+  // 달력 날짜 변경 & 모달창 열기
   const handleDateChange = (selectedDate) => {
+    // TO DO : 주말에만 모달 열리게 수정
     onChange(selectedDate);
+    setIsModalOpen(true);
   };
 
   // 주말 배열
@@ -107,6 +115,32 @@ export default function Home() {
             }
           }}
         />
+        {isModalOpen && (
+          <Modal onClose={() => setIsModalOpen(false)}>
+            <h3 className="font-bold mb-3">{selectedDate} 작업자 수정 모달</h3>
+            <div className="flex items-center gap-5 mb-2">
+              <h1>담당자 1</h1>
+              <Dropdown
+                buttonContent={
+                  assignedWorkers.find((worker) => worker.date === dateofSelectedDate)
+                    ?.workers[0]
+                }
+                dropdownContent={dropdownContents}
+              />
+            </div>
+            <div className="flex items-center gap-5">
+              <h1>담당자 2</h1>
+              <Dropdown
+                buttonContent={
+                  assignedWorkers.find((worker) => worker.date === dateofSelectedDate)
+                    ?.workers[1]
+                }
+                dropdownContent={dropdownContents}
+              />
+            </div>
+            <button className="bg-blue-500 text-white w-full mt-5 rounded-lg p-2">저장</button>
+          </Modal>
+        )}
         <section className="w-full md:w-1/2 bg-white rounded-lg p-4 shadow-md mt-4 flex flex-col justify-center">
           <p className="text-lg font-semibold mb-2 text-center">
             {monthOfSelectedDate}월 뚜둥이 냉판 작업
