@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 interface DropdownProps {
   buttonContent: React.ReactNode;
   dropdownContent: React.ReactNode[];
+  onSelect: (selectedOption) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent }: DropdownProps) => {
+const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent, onSelect }: DropdownProps) => {
   const [selectedContent, setSelectedContent] = useState<React.ReactNode>(buttonContent);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -14,8 +15,9 @@ const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent }: D
   };
 
   const handleContentSelect = (content: React.ReactNode) => {
-    setSelectedContent(content);
     toggleDropdown();
+    onSelect(content);
+    setSelectedContent(content);
   };
 
   return (
