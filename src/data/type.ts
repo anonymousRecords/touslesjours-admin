@@ -3,12 +3,12 @@ export type ValuePiece = Date | null;
 export type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 export type WeekendArray = {
-  date: number;
+  date: string;
   person: string[];
 };
 
 export type AssignedWorkers = {
-  date: number;
+  date: string;
   workers: string[];
 };
 
