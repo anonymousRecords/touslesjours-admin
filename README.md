@@ -130,3 +130,46 @@ luckyPersonId를 personList.length로 나눈 나머지를 인덱스로 사용하
 샌드위치의 경우, 요일 스티커를 붙인다.   
 현재 수작업으로 해당 날짜의 요일 스티커를 표시하는데, 이를 자동화하는 기능을 추가할 예정이다.  
 (주, 녹, 흰 이렇게 스티커가 매일 돌아가면서 붙여지는데, 현재는 해당 날짜의 스티커가 무슨 색인지 매일 동그라미로 체크하면서 운영되고 있다.)   
+
+## 🥖 행뚜둥 Log2
+### 요약
+<table>
+    <tr>
+        <th>작업 기간</th>
+        <td>2024-05-04~05, 05-12</td>
+    </tr>
+    <tr>
+        <th>작업 내역</th>
+        <td>UI 변경 및 Supabase 추가</td>
+    </tr>
+</table>
+
+### 1. Accordian을 이용한 UI 변경
+
+![ui](https://github.com/anonymousRecords/touslesjours-admin/assets/97885933/bce784d9-20c1-45dd-9e1d-09f53f1cc0b1)
+
+이전에는 내용을 모두 노출시키는 UI였다면,   
+Accordian을 사용하여 유저로 하여금 확인하고 싶은 내용을 선택할 수 있게 변경하였다.   
+이때 Accordian을 공통 컴포넌트로 설계하여 사용하였다.
+
+```
+interface AccordianProps {
+  title: string;
+  children: ReactNode;
+  isAccordianOpen: boolean;
+  onClick: () => void;
+}
+```
+interface의 경우, 위와 같이 설계하였는데   
+Accordian 안에 담기는 내용은 children으로 담아 보이게 하였다.   
+이렇게 하면 자유로운 장점은 있지만, 조금 더 구체적으로 설계해도 괜찮지 않았을까 하는 생각이 남는다.   
+
+### 2. Supabase 사용
+
+![change](https://github.com/anonymousRecords/touslesjours-admin/assets/97885933/e4d2d8bb-eefe-419d-a165-131d2da49e33)
+
+[Supabase](https://supabase.com/)를 사용하여 데이터를 관리하고자 하였다.   
+이전까지는 정적 렌더링 웹 사이트였다면, 할당된 작업자 수정을 통해 동적 웹 사이트로 변경되었다.   
+
+Firebase를 사용할 지 아니면 Supabase를 사용할 지 고민하다가,   
+**관계형데이터베이스의 스키마와 join을 사용한다는 측면에서** Supabase가 더 좋겠다는 판단 하에 supabase를 채택했다.
