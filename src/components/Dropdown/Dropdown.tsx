@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface DropdownProps {
   buttonContent: React.ReactNode;
-  dropdownContent: React.ReactNode[];
-  onSelect: (selectedOption) => void;
+  dropdownContent: string[];
+  onSelect: (content) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent, onSelect }: DropdownProps) => {
-  const [selectedContent, setSelectedContent] = useState<React.ReactNode>(buttonContent);
+const Dropdown: React.FC<DropdownProps> = ({
+  buttonContent,
+  dropdownContent,
+  onSelect,
+}: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  // const [selectedContent, setSelectedContent] = useState<string>();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleContentSelect = (content: React.ReactNode) => {
+  const handleContentSelect = (index) => {
     toggleDropdown();
-    onSelect(content);
-    setSelectedContent(content);
+    onSelect(index);
+    setIsOpen(!isOpen);
+    // setSelectedContent(dropdownContent[index]);
   };
 
   return (
@@ -26,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent, onS
         onClick={toggleDropdown}
         className="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-black hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
       >
-        {selectedContent}
+        <div>{buttonContent}</div>
         {isOpen ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -60,8 +65,8 @@ const Dropdown: React.FC<DropdownProps> = ({ dropdownContent, buttonContent, onS
             {dropdownContent.map((content, index) => (
               <button
                 key={index}
-                onClick={() => handleContentSelect(content)}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                onClick={() => handleContentSelect(index)}
+                className="block  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 role="menuitem"
               >
                 {content}
