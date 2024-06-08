@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
-import './globals.css';
+import './styles/globals.css';
 import localFont from 'next/font/local';
+import { Suspense } from 'react';
+import { Navbar } from '@/components/Navbar';
+import Loading from '@/loading';
 
 const pretendardFont = localFont({
-  src: './fonts/PretendardVariable.woff2',
+  src: '../fonts/PretendardVariable.woff2',
   display: 'swap',
 });
 
@@ -19,7 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={pretendardFont.className}>{children}</body>
+      <Suspense fallback={<Loading />} />
+      <body className={pretendardFont.className}>
+        <Navbar />
+        <div>{children}</div>
+      </body>
     </html>
   );
 }
