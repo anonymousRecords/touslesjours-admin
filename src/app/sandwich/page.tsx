@@ -1,7 +1,6 @@
 'use client';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { useState } from 'react';
-import { Navbar } from '@/components/Navbar';
 import { SandwichTable } from '@/components/SandwichTable';
 
 export default function SandwichPage() {
@@ -19,7 +18,6 @@ export default function SandwichPage() {
 
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen ">
-      <Navbar />
       <main className="flex flex-col gap-10 items-center justify-center flex-1 p-4">
         <div>
           <button onClick={() => handleWeekChange('prev')}>이전</button>
