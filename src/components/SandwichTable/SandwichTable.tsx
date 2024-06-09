@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { sandwichRows, sandwichColumns } from '@/data/type';
+import { colorsContent, sandwichColumns, sandwichRows } from '@/constants';
 import { supabase } from '@/supabase/supabase';
 import { weekdayFromNumber } from '@/util/weekdayFromNumber';
 import { Dropdown } from '../Dropdown';
@@ -15,14 +15,6 @@ type SandwichData = {
   sandwich_type: string;
   dropdown_data: string;
 };
-
-// const colors = [
-//   { id: 0, name: '주', color: '#FF8C06' },
-//   { id: 1, name: '녹', color: '#18CE61' },
-//   { id: 2, name: '흰', color: '#FFFFFF' },
-// ];
-
-const colorsContent = ['주', '녹', '흰'];
 
 interface SandwichTableProps {
   weekArray: string[];
@@ -122,8 +114,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
   const todayDate = format(new Date(), 'yyyy-MM-dd');
 
   // 모두 지우기 기능
-  // 1. 날짜(th)을 클릭하면 해당 날짜에 해당하는 Dropdown border 색상이 변경
-  // 2. 모두 지우기 버튼을 클릭하면 supabase에서 해당 날짜의 데이터를 모두 삭제
+  // 1. 모두 지우기 버튼을 클릭하면 supabase에서 해당 날짜의 데이터를 모두 삭제
 
   const handleDeleteAllData = async (date: string | undefined) => {
     const period = `${weekArray[0]} ~ ${weekArray[6]}`;
@@ -142,6 +133,12 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
 
   // 활성화 날짜
   const [activeDay, setActiveDay] = useState<string>();
+
+  // 모두 채우기 기능
+  // 1. 모두 채우기 버튼을 클릭하면 전 날 데이터를 가져와서 새로운 데이터로 삽입
+  // 2. 전 날 데이터가 없을 경우 아무것도 하지 않음
+  // 3. 전 날 데이터가 있을 경우 샌드위치 종류에 따라 다음 날 데이터를 채움 (주 -> 녹 / 녹 -> 흰 / 흰 -> 주 / 기타 -> 기타)
+
   const handleFillAllData = async (date: string | undefined) => {
     const period = `${weekArray[0]} ~ ${weekArray[6]}`;
     if (date === undefined) {
@@ -177,7 +174,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
             nextDropdownData = '주';
             break;
           default:
-            nextDropdownData = '주';
+            nextDropdownData = '기타';
             break;
         }
         return {
@@ -202,21 +199,23 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
 
   return (
     <div>
-      <div>
+      <div className="flex justify-end mb-5">
         <div className="flex gap-5">
           <button
+            className="bg-[#0C4630] text-white font-semibold px-3 py-1 rounded-md"
             onClick={() => {
               handleFillAllData(activeDay);
             }}
           >
-            모두 채우기
+            모두 채우기 (+)
           </button>
           <button
+            className="bg-[#0C4630] text-white font-semibold px-3 py-1 rounded-md"
             onClick={() => {
               handleDeleteAllData(activeDay);
             }}
           >
-            모두 지우기
+            모두 지우기 (-)
           </button>
         </div>
       </div>
@@ -238,7 +237,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
                 onClick={() => {
                   setActiveDay(week);
                 }}
-                className="text-xs font-extralight"
+                className="text-lg font-extralight cursor-pointer"
               >
                 {week}
               </th>
@@ -252,7 +251,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
               <td>{column}</td>
               {/* 나머지 칸들은 Dropdown으로 채워지도록 */}
               {sandwichRows.map((row, rowIndex) => (
-                <td key={rowIndex}>
+                <td key={rowIndex} className="text-center">
                   <Dropdown
                     buttonContent={dropdownData[columnIndex][rowIndex]}
                     dropdownContent={colorsContent}

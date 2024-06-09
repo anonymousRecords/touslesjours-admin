@@ -16,7 +16,6 @@ const Dropdown: React.FC<DropdownProps> = ({
   isActive,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  // const [selectedContent, setSelectedContent] = useState<string>();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -35,7 +34,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         className={`${isToday ? 'border-4 border-[#FFBF00]' : ''} ${isActive ? 'border-4 border-red-400' : ''} bg-gray-400 inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-black focus:ring-2 focus:ring-offset-2 focus:ring-gray-300`}
       >
         <div
-          className={`${buttonContent === '주' ? 'text-[#FF8C06]' : buttonContent === '녹' ? 'text-[#18CE61]' : buttonContent === '흰' ? 'text-[#FFFFFF]' : ''}`}
+          className={`${buttonContent === '주' ? 'text-[#FF8C06]' : buttonContent === '녹' ? 'text-[#18CE61]' : buttonContent === '흰' ? 'text-[#FFFFFF]' : buttonContent === '기타' ? 'text-pink-200' : ''}`}
         >
           {buttonContent}
         </div>
