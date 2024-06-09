@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: '뚜레쥬르',
   description: '행복한 뚜둥이 생활을 위하여',
   icons: {
-    icon: '/favicon.ico',
+    icon: './favicon.ico',
   }
 };
 
