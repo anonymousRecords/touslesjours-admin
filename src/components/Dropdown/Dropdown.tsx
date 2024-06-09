@@ -4,12 +4,16 @@ interface DropdownProps {
   buttonContent: React.ReactNode;
   dropdownContent: string[];
   onSelect: (content) => void;
+  isToday?: boolean;
+  isActive?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
   buttonContent,
   dropdownContent,
   onSelect,
+  isToday,
+  isActive,
 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [selectedContent, setSelectedContent] = useState<string>();
@@ -22,16 +26,19 @@ const Dropdown: React.FC<DropdownProps> = ({
     toggleDropdown();
     onSelect(index);
     setIsOpen(!isOpen);
-    // setSelectedContent(dropdownContent[index]);
   };
 
   return (
     <div className="relative inline-block">
       <button
         onClick={toggleDropdown}
-        className="inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-black hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+        className={`${isToday ? 'border-4 border-[#FFBF00]' : ''} ${isActive ? 'border-4 border-red-400' : ''} bg-gray-400 inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-black focus:ring-2 focus:ring-offset-2 focus:ring-gray-300`}
       >
-        <div>{buttonContent}</div>
+        <div
+          className={`${buttonContent === '주' ? 'text-[#FF8C06]' : buttonContent === '녹' ? 'text-[#18CE61]' : buttonContent === '흰' ? 'text-[#FFFFFF]' : ''}`}
+        >
+          {buttonContent}
+        </div>
         {isOpen ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
