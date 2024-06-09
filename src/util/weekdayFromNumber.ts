@@ -1,4 +1,4 @@
-import { sandwichRows } from "@/data/type";
+import { sandwichRows } from "@/constants";
 
 export const weekdayFromNumber = (numberOrString) => {
     if (typeof numberOrString === 'number') {

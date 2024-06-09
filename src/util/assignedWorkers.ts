@@ -1,5 +1,6 @@
 // Info: 주말 배열에 작업자 할당하기
-import { AssignedWorkers, personList, WeekendArray } from "@/data/type";
+import { personList } from "@/constants";
+import { AssignedWorkers, WeekendArray } from "@/data/type";
 
 export const assignWorkers = (weekendArray: WeekendArray[]): AssignedWorkers[] => {
   const workers: AssignedWorkers[] = [];
