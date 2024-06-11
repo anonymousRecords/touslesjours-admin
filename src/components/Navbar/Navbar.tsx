@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { navElements } from '@/constants';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [clickedLink, setClickedLink] = useState<string | null>(null);
+  const { status } = useSession();
 
   const isActive = (name: string) => {
     // "/" 경로는 예외 처리
@@ -18,10 +20,14 @@ export default function Navbar() {
   };
 
   const handleClick = (name: string) => {
-    setClickedLink(name);
-    setTimeout(() => {
-      setClickedLink(null);
-    }, 500); // Duration of the animation
+    if (status === 'authenticated') {
+      setClickedLink(name);
+      setTimeout(() => {
+        setClickedLink(null);
+      }, 500); 
+    } else {
+      alert('로그인이 필요합니다.');
+    }
   };
 
   return (
@@ -34,7 +40,7 @@ export default function Navbar() {
           <section className="flex gap-4 items-center">
             {navElements.map((elem) => (
               <Link
-                href={elem.href}
+                href={status === 'authenticated' ? elem.href : '#'}
                 key={elem.name}
                 onClick={() => handleClick(elem.name)}
                 className={`${isActive(elem.name) ? 'text-[#FFBF00]' : 'text-white'} ${clickedLink === elem.name ? 'animate-bounce' : ''} text-xs md:text-sm`}
