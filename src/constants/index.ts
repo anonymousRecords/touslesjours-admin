@@ -14,11 +14,11 @@ export const navElements = [
     label: '샌드위치 스티커',
     href: '/sandwich',
   },
-  {
-    name: 'cake',
-    label: '케이크 예약',
-    href: '/cake',
-  },
+  // {
+  //   name: 'cake',
+  //   label: '케이크 예약',
+  //   href: '/cake',
+  // },
 ];
 
 export const colorsContent = ['주', '녹', '흰', '기타'];
