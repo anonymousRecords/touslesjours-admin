@@ -212,3 +212,9 @@ Firebase를 사용할 지 아니면 Supabase를 사용할 지 고민하다가,
 
 실제로 운영을 하는 웹 사이트이기 때문에, 아무나 들어와서 데이터를 변경하는 것을 막아야 했다.   
 따라서 [NextAuth](https://next-auth.js.org/) 를 통해 로그인 기능을 추가하였다.
+
+### 3. 아 엠어 행뚜둥
+<img width="740" alt="image" src="https://github.com/anonymousRecords/touslesjours-admin/assets/97885933/fb571cdc-f83a-4402-805c-081c725432ef">
+
+포스기에 웹 사이트 접속해서 실제로 잘 쓰고 있따 ^___^
+
