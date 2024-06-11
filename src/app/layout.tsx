@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { Suspense } from 'react';
 import { Navbar } from '@/components/Navbar';
 import Loading from '@/loading';
+import AuthProvider from './context/AuthProvider';
 
 const pretendardFont = localFont({
   src: '../fonts/PretendardVariable.woff2',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   description: '행복한 뚜둥이 생활을 위하여',
   icons: {
     icon: './favicon.ico',
-  }
+  },
 };
 
 export default function RootLayout({
@@ -25,11 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Suspense fallback={<Loading />} />
-      <body className={pretendardFont.className}>
-        <Navbar />
-        <div>{children}</div>
-      </body>
+      <AuthProvider>
+        <Suspense fallback={<Loading />} />
+        <body className={pretendardFont.className}>
+          <Navbar />
+          <div>{children}</div>
+        </body>
+      </AuthProvider>
     </html>
   );
 }
