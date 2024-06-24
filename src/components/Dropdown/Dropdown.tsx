@@ -3,7 +3,7 @@ import { useState } from 'react';
 interface DropdownProps {
   buttonContent: React.ReactNode;
   dropdownContent: string[];
-  onSelect: (content) => void;
+  onSelect: (index: number) => void;
   isToday?: boolean;
   isActive?: boolean;
 }
@@ -21,10 +21,9 @@ const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleContentSelect = (index) => {
+  const handleContentSelect = (index: number) => {
     toggleDropdown();
     onSelect(index);
-    setIsOpen(!isOpen);
   };
 
   return (
