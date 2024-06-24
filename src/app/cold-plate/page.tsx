@@ -22,8 +22,8 @@ import 'react-calendar/dist/Calendar.css';
 const dropdownContents = ['1번 뚜둥이', '2번 뚜둥이', '3번 뚜둥이'];
 
 export default function Home() {
-  const [selectedWorker1, setSelectedWorker1] = useState();
-  const [selectedWorker2, setSelectedWorker2] = useState();
+  const [selectedWorker1, setSelectedWorker1] = useState<string>();
+  const [selectedWorker2, setSelectedWorker2] = useState<string>();
   const [workScheduleData, setWorkScheduleData] = useState<AssignedWorkers[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -228,9 +228,7 @@ export default function Home() {
               <Dropdown
                 buttonContent={data.find((worker) => worker.date === selectedDate)?.workers[0]}
                 dropdownContent={dropdownContents}
-                onSelect={(buttonContent) => {
-                  setSelectedWorker1(buttonContent);
-                }}
+                onSelect={(buttonContent) => setSelectedWorker1(buttonContent)}
               />
             </div>
             <div className="flex items-center gap-5">

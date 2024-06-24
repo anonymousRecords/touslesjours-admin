@@ -3,7 +3,7 @@ import { useState } from 'react';
 interface DropdownProps {
   buttonContent: React.ReactNode;
   dropdownContent: string[];
-  onSelect: (index: number) => void;
+  onSelect: (content: string) => void;
   isToday?: boolean;
   isActive?: boolean;
 }
@@ -21,7 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleContentSelect = (index: number) => {
+  const handleContentSelect = (index: string) => {
     toggleDropdown();
     onSelect(index);
   };
@@ -70,7 +70,7 @@ const Dropdown: React.FC<DropdownProps> = ({
             {dropdownContent.map((content, index) => (
               <button
                 key={index}
-                onClick={() => handleContentSelect(index)}
+                onClick={() => handleContentSelect(String(index))}
                 className="block  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 role="menuitem"
               >

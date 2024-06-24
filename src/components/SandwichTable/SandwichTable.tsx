@@ -56,7 +56,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
   const handleDropDownChange = async (
     columnIndex: number,
     rowIndex: number,
-    colorIndex: number,
+    colorIndex: string,
   ) => {
     const date = weekArray[rowIndex];
     const colorName = colorsContent[colorIndex];
@@ -255,7 +255,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
                   <Dropdown
                     buttonContent={dropdownData[columnIndex][rowIndex]}
                     dropdownContent={colorsContent}
-                    onSelect={(index: number) => {
+                    onSelect={(index: string) => {
                       handleDropDownChange(columnIndex, rowIndex, index);
                     }}
                     isToday={weekArray[rowIndex] === todayDate}
