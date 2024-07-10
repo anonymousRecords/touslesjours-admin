@@ -23,11 +23,15 @@ export default function SandwichPage() {
     setCurrentDate(newDate);
   };
 
+  if (weekArray.length === 0) {
+    return null;
+  }
+
   return (
     <main className="flex flex-col gap-10 items-center justify-center flex-1 p-4">
       <div className="flex gap-5">
         <button onClick={() => handleWeekChange('prev')}>이전</button>
-        <span className='text-lg font-bold'>{`${weekArray[0]} ~ ${weekArray[6]}`}</span>
+        <span className="text-lg font-bold">{`${weekArray[0]} ~ ${weekArray[6]}`}</span>
         <button onClick={() => handleWeekChange('next')}>다음</button>
       </div>
 
