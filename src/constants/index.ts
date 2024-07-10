@@ -41,6 +41,6 @@ export const sandwichColumns = [
   '리코타',
   '쉬림프에그',
   '고단백',
-];
+] as const;
 
 export const sandwichRows = ['월', '화', '수', '목', '금', '토', '일'];

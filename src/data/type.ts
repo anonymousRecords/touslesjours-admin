@@ -1,3 +1,5 @@
+import { sandwichColumns } from '../constants';
+
 export type ValuePiece = Date | null;
 
 export type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -12,11 +14,4 @@ export type AssignedWorkers = {
   workers: string[];
 };
 
-export type SandwichData = {
-  id: string;
-  period: string;
-  date: string;
-  days: string;
-  sandwich_type: string;
-  dropdown_data: string;
-};
+export type SandwichType = (typeof sandwichColumns)[number];
