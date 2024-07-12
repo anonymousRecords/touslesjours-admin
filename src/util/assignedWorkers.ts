@@ -1,9 +1,9 @@
 // Info: 주말 배열에 작업자 할당하기
-import { personList } from "@/constants";
-import { AssignedWorkers, WeekendArray } from "@/data/type";
+import { personList } from '@/constants';
+import { AssignedWorkers, WeekendArray } from '@/data/type';
 
-export const assignWorkers = (weekendArray: WeekendArray[]): AssignedWorkers[] => {
-  const workers: AssignedWorkers[] = [];
+export const assignWorkers = (weekendArray: WeekendArray[]) => {
+  const workers: Omit<AssignedWorkers, 'id'>[] = [];
   let luckyPersonId = 0;
 
   // 주말에 대해 반복
@@ -13,7 +13,10 @@ export const assignWorkers = (weekendArray: WeekendArray[]): AssignedWorkers[] =
     luckyPersonId++;
     const worker2 = personList[luckyPersonId % personList.length].name;
     luckyPersonId++;
-    workers.push({ date, workers: [worker1, worker2] });
+    workers.push({
+      date,
+      workers: [worker1, worker2],
+    });
   }
   return workers;
 };

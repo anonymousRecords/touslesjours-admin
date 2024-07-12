@@ -1,7 +1,6 @@
 'use client';
 
 import { format } from 'date-fns';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { Accordian } from '@/components/Accordian';
@@ -22,31 +21,43 @@ import 'react-calendar/dist/Calendar.css';
 const dropdownContents = ['1번 뚜둥이', '2번 뚜둥이', '3번 뚜둥이'];
 
 export default function Home() {
-  const [selectedWorker1, setSelectedWorker1] = useState<string>();
-  const [selectedWorker2, setSelectedWorker2] = useState<string>();
-  const [workScheduleData, setWorkScheduleData] = useState<AssignedWorkers[]>([]);
+  const [selectedWorker1, setSelectedWorker1] = useState<string | null>(null);
+  const [selectedWorker2, setSelectedWorker2] = useState<string | null>(null);
+  const [data, setWorkScheduleData] = useState<AssignedWorkers[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 저장하기 버튼 클릭 시 실행되는 함수
   const handleSaveClick = async () => {
     // selectedDate로 선택한 날짜의 데이터를 가져와서 수정
-    const selectedData = workScheduleData.find((worker) => worker.date === selectedDate);
-    if (selectedData) {
+    const selectedData = data.find((worker) => worker.date === selectedDate);
+
+    if (selectedData && selectedWorker1 && selectedWorker2) {
       const newData = {
         ...selectedData,
         workers: [selectedWorker1, selectedWorker2],
       };
-      console.log('newData', newData);
+
       try {
-        const { error } = await supabase.from('work_schedule').upsert([newData]);
+        const { error } = await supabase.from('work_schedule').upsert(newData);
         if (error) {
           throw error;
         }
-        console.log('데이터가 성공적으로 업데이트되었습니다:', newData);
+
+        const { data: updatedData, error: updateError } = await supabase
+          .from('work_schedule')
+          .select('*');
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        setWorkScheduleData(getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate));
       } catch (error) {
         console.error('데이터를 업데이트하는 도중 오류가 발생했습니다:', error);
       }
     }
+    setSelectedWorker1(null);
+    setSelectedWorker2(null);
     setIsModalOpen(false);
   };
 
@@ -72,7 +83,7 @@ export default function Home() {
   const [value, onChange] = useState<string>(date);
 
   // 선택한 날짜
-  const selectedDate = moment(value).format('YYYY-MM-DD');
+  const selectedDate = format(value, 'yyyy-MM-dd');
 
   // 선택한 날짜의 달
   const yearOfSelectedDate = Number(selectedDate.split('-')[0]);
@@ -86,41 +97,16 @@ export default function Home() {
   // 주말에 작업자 할당
   const assignedWorkers = assignWorkers(weekendArray as WeekendArray[]);
 
-  // 작업 일정 데이터 가져오기
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase.from('work_schedule').select('*');
-
-        if (error) {
-          console.error('Error fetching data:', error);
-          return null;
-        }
-        if (!data) {
-          return;
-        }
-        setWorkScheduleData(data);
-        return data;
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        return null;
-      }
-    };
-    fetchData();
-  }, [onChange, isModalOpen]);
-
-  const data = getMonthlyWorkScheduleData(workScheduleData, monthOfSelectedDate);
-
   // 달력 날짜 변경 & 모달창 열기
-  const handleDateChange = (selectedDate) => {
+  const handleDateChange = (_selectedDate) => {
+    const selectedDate = format(_selectedDate, 'yyyy-MM-dd');
     onChange(selectedDate);
-    //주말인지 확인
-    if (isWeekend(new Date(selectedDate))) {
-      // 과거 날짜인지 확인
-      if (!isPastDate(new Date(selectedDate))) {
-        // 주말이면서 현재나 과거 날짜가 아니면 상태 변경
-        setIsModalOpen(true);
-      }
+
+    // 주말이면서 현재나 과거 날짜가 아니면 상태 변경
+    if (isWeekend(new Date(selectedDate)) && !isPastDate(new Date(selectedDate))) {
+      setSelectedWorker1(data.find((worker) => worker.date === selectedDate)?.workers?.[0] || null);
+      setSelectedWorker2(data.find((worker) => worker.date === selectedDate)?.workers?.[1] || null);
+      setIsModalOpen(true);
     }
   };
 
@@ -157,26 +143,40 @@ export default function Home() {
         } else {
           console.log('추가할 작업 일정이 없습니다.');
         }
+
+        const { data: updatedData, error: updateError } = await supabase
+          .from('work_schedule')
+          .select('*');
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        setWorkScheduleData(getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate));
       } catch (error) {
         console.error('작업 일정을 등록하는 도중 오류가 발생했습니다:', error);
       }
     };
 
     addWorkSchedule();
-  }, [assignedWorkers]);
+  }, [JSON.stringify(weekendArray)]);
 
   // 작업자 목록 출력
   const renderWorkers = () => {
-    return data.map((assignment, index) => (
-      <div key={index}>
-        <div className="font-semibold">
+    return data.map((assignment) => {
+      if (!assignment.workers) {
+        return null;
+      }
+
+      return (
+        <div key={assignment.id} className="font-semibold">
           {assignment.date}일의 담당자:
           <p className="font-normal">
             {assignment.workers[0]}, {assignment.workers[1]}
           </p>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   // 특정 담당자의 작업 횟수 카운트
@@ -190,6 +190,13 @@ export default function Home() {
         <Calendar
           locale="ko-KR"
           onChange={handleDateChange}
+          onActiveStartDateChange={({ activeStartDate }) => {
+            if (!activeStartDate) {
+              return;
+            }
+
+            onChange(format(activeStartDate, 'yyyy-MM-dd'));
+          }}
           value={value}
           showNeighboringMonth={false}
           tileContent={({ date }) => {
@@ -202,16 +209,16 @@ export default function Home() {
                       className="rounded-full w-4 h-4"
                       style={{
                         backgroundColor:
-                          personList.find((person) => person.name === data[i].workers[0])?.color ||
-                          'transparent',
+                          personList.find((person) => person.name === data[i].workers?.[0])
+                            ?.color || 'transparent',
                       }}
                     ></div>
                     <div
                       className="rounded-full w-4 h-4"
                       style={{
                         backgroundColor:
-                          personList.find((person) => person.name === data[i].workers[1])?.color ||
-                          'transparent',
+                          personList.find((person) => person.name === data[i].workers?.[1])
+                            ?.color || 'transparent',
                       }}
                     ></div>
                   </div>
@@ -226,17 +233,17 @@ export default function Home() {
             <div className="flex items-center gap-5 mb-2">
               <h1>담당자 1</h1>
               <Dropdown
-                buttonContent={data.find((worker) => worker.date === selectedDate)?.workers[0]}
+                buttonContent={selectedWorker1}
                 dropdownContent={dropdownContents}
-                onSelect={(buttonContent) => setSelectedWorker1(buttonContent)}
+                onSelect={(workerIndex) => setSelectedWorker1(personList[Number(workerIndex)].name)}
               />
             </div>
             <div className="flex items-center gap-5">
               <h1>담당자 2</h1>
               <Dropdown
-                buttonContent={data.find((worker) => worker.date === selectedDate)?.workers[1]}
+                buttonContent={selectedWorker2}
                 dropdownContent={dropdownContents}
-                onSelect={(selectedOption) => setSelectedWorker2(selectedOption)}
+                onSelect={(workerIndex) => setSelectedWorker2(personList[Number(workerIndex)].name)}
               />
             </div>
             <button
