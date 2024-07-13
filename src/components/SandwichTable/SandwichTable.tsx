@@ -2,9 +2,15 @@
 
 import { format } from 'date-fns';
 import { useState } from 'react';
+import {
+  deleteSandwichSchedule,
+  getSandwichScheduleByDate,
+  getSandwichSchedulesByPeriod,
+  upsertSandwichSchedule,
+} from '@/apis/sandwich';
 import { colorsContent, sandwichColumns, sandwichRows } from '@/constants';
+import { Tables } from '@/data/supabase';
 import { useGetSanwichData } from '@/hooks/useGetSandwichData';
-import { supabase } from '@/supabase/supabase';
 import { weekdayFromNumber } from '@/util/weekdayFromNumber';
 import { Dropdown } from '../Dropdown';
 
@@ -13,8 +19,9 @@ interface SandwichTableProps {
 }
 
 const SandwichTable = ({ weekArray }: SandwichTableProps) => {
-  // Dropdown 데이터를 관리하는 useState
+  const [activeDay, setActiveDay] = useState<string | null>(null);
   const { dropdownData, onDropdownChange } = useGetSanwichData(weekArray);
+  const todayDate = format(new Date(), 'yyyy-MM-dd');
   const period = `${weekArray[0]} ~ ${weekArray[6]}`;
 
   const handleDropDownChange = async (
@@ -25,47 +32,31 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
     const date = weekArray[rowIndex];
     const sandwichType = sandwichColumns[columnIndex];
 
-    try {
-      await supabase.from('sandwich_schedule').upsert({
-        id: date + sandwichType,
-        period: period,
-        date: date,
-        days: sandwichRows[rowIndex],
-        sandwich_type: sandwichType,
-        dropdown_data: colorsContent[colorIndex],
-      });
+    await upsertSandwichSchedule({
+      id: date + sandwichType,
+      period: period,
+      date: date,
+      days: sandwichRows[rowIndex],
+      sandwich_type: sandwichType,
+      dropdown_data: colorsContent[colorIndex],
+    });
 
-      const { data } = await supabase.from('sandwich_schedule').select('*').eq('period', period);
-
-      onDropdownChange(data ?? []);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    const existingData = await getSandwichSchedulesByPeriod(period);
+    onDropdownChange(existingData);
   };
 
-  // 오늘 날짜 구하기
-  const todayDate = format(new Date(), 'yyyy-MM-dd');
-
-  // 모두 지우기 기능
-  // 1. 모두 지우기 버튼을 클릭하면 supabase에서 해당 날짜의 데이터를 모두 삭제
 
   const handleDeleteAllData = async (date: string | null) => {
     if (date == null) {
       return;
     }
 
-    try {
-      await supabase.from('sandwich_schedule').delete().eq('date', date);
+    await deleteSandwichSchedule(date);
 
-      const { data } = await supabase.from('sandwich_schedule').select('*').eq('period', period);
-      onDropdownChange(data ?? []);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    const existingData = await getSandwichSchedulesByPeriod(period);
+    onDropdownChange(existingData);
   };
 
-  // 활성화 날짜
-  const [activeDay, setActiveDay] = useState<string | null>(null);
 
   // 모두 채우기 기능
   // 1. 모두 채우기 버튼을 클릭하면 전 날 데이터를 가져와서 새로운 데이터로 삽입
@@ -77,39 +68,28 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
       return;
     }
 
-    // 전 날 데이터 가져오기
     const previousDateIndex = weekArray.indexOf(date) - 1;
     const previousDate = previousDateIndex >= 0 ? weekArray[previousDateIndex] : undefined;
-    const { data: previousData } = previousDate
-      ? await supabase.from('sandwich_schedule').select('*').eq('date', previousDate)
-      : { data: [] };
-
+    const previousData = previousDate
+      ? await getSandwichScheduleByDate(previousDate)
+      : [];
+    console.log(previousData);
     if (previousData == null) {
       return;
     }
 
-    // 모두 채우기
     if (previousData.length > 0) {
-      // 전 날 데이터가 존재할 때만 처리
-      const newData = previousData?.map((item) => {
-        let nextDropdownData: string;
-        switch (item.dropdown_data) {
-          case '주':
-            nextDropdownData = '녹';
-            break;
-          case '녹':
-            nextDropdownData = '흰';
-            break;
-          case '흰':
-            nextDropdownData = '주';
-            break;
-          default:
-            nextDropdownData = '기타';
-            break;
-        }
+      const newData: Array<Tables<'sandwich_schedule'>> = previousData?.map((item) => {
+
+        const nextDropdownData =
+          item.dropdown_data == null
+            ? '기타'
+            : { 주: '녹', 녹: '흰', 흰: '주' }[item.dropdown_data] ?? '기타';
+
         return {
           ...item,
           id: activeDay + item.sandwich_type,
+          sandwich_type: item.sandwich_type,
           period: `${weekArray[0]} ~ ${weekArray[6]}`,
           date: activeDay as string,
           days: weekdayFromNumber(previousDateIndex + 1),
@@ -117,12 +97,12 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
         };
       });
 
-      // 새로운 데이터를 DB에 삽입
-      await supabase.from('sandwich_schedule').upsert(newData);
+      for (const item of newData) {
+        await upsertSandwichSchedule(item);
+      }
 
-      // 업데이트된 데이터 불러오기
-      const { data } = await supabase.from('sandwich_schedule').select('*').eq('period', period);
-      onDropdownChange(data ?? []);
+      const existingData = await getSandwichSchedulesByPeriod(period);
+      onDropdownChange(existingData);
     }
   };
 

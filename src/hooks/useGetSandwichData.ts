@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { getSandwichSchedulesByPeriod } from '@/apis/sandwich';
 import { sandwichColumns, sandwichRows } from '@/constants';
 import { Tables } from '@/data/supabase';
-import { supabase } from '@/supabase/supabase';
 import { makeTable } from '@/util/makeTable';
 
 export function useGetSanwichData(weekArray: string[]) {
@@ -38,19 +38,8 @@ export function useGetSanwichData(weekArray: string[]) {
     const period = `${weekArray[0]} ~ ${weekArray[6]}`;
 
     const fetchSandwichData = async () => {
-      try {
-        const { data: sandwichData, error: sandwichError } = await supabase
-          .from('sandwich_schedule')
-          .select('*')
-          .eq('period', period);
-
-        if (sandwichError) {
-          throw sandwichError;
-        }
-        setDropdownData(formatSandwichData(sandwichData));
-      } catch (error) {
-        console.error('Error:', error);
-      }
+      const existingData = await getSandwichSchedulesByPeriod(period);
+      setDropdownData(formatSandwichData(existingData));
     };
 
     fetchSandwichData();
