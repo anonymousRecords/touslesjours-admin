@@ -1,6 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { useState } from 'react';
 import {
   deleteSandwichSchedule,
@@ -11,7 +12,6 @@ import {
 import { colorsContent, sandwichColumns, sandwichRows } from '@/constants';
 import { Tables } from '@/data/supabase';
 import { useGetSanwichData } from '@/hooks/useGetSandwichData';
-import { weekdayFromNumber } from '@/util/weekdayFromNumber';
 import { Dropdown } from '../../../../components/Dropdown';
 
 interface SandwichTableProps {
@@ -62,20 +62,19 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
   // 3. 전 날 데이터가 있을 경우 샌드위치 종류에 따라 다음 날 데이터를 채움 (주 -> 녹 / 녹 -> 흰 / 흰 -> 주 / 기타 -> 기타)
 
   const handleFillAllData = async (date: string | null) => {
-    if (date == null) {
+    if (date == null || activeDay == null) {
       return;
     }
 
-    const previousDateIndex = weekArray.indexOf(date) - 1;
-    const previousDate = previousDateIndex >= 0 ? weekArray[previousDateIndex] : undefined;
-    const previousData = previousDate ? await getSandwichScheduleByDate(previousDate) : [];
-    console.log(previousData);
+    const previousDate = format(new Date(date).valueOf() - 1000 * 60 * 60 * 24, 'yyyy-MM-dd');
+    const previousData = await getSandwichScheduleByDate(previousDate);
+
     if (previousData == null) {
       return;
     }
 
     if (previousData.length > 0) {
-      const newData: Array<Tables<'sandwich_schedule'>> = previousData?.map((item) => {
+      const newData: Array<Tables<'sandwich_schedule'>> = previousData.map((item) => {
         const nextDropdownData =
           item.dropdown_data == null
             ? '기타'
@@ -86,8 +85,8 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
           id: activeDay + item.sandwich_type,
           sandwich_type: item.sandwich_type,
           period: `${weekArray[0]} ~ ${weekArray[6]}`,
-          date: activeDay as string,
-          days: weekdayFromNumber(previousDateIndex + 1),
+          date: activeDay,
+          days: format(activeDay, 'E', { locale: ko }),
           dropdown_data: nextDropdownData,
         };
       });
