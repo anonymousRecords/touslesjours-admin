@@ -12,7 +12,7 @@ import { colorsContent, sandwichColumns, sandwichRows } from '@/constants';
 import { Tables } from '@/data/supabase';
 import { useGetSanwichData } from '@/hooks/useGetSandwichData';
 import { weekdayFromNumber } from '@/util/weekdayFromNumber';
-import { Dropdown } from '../Dropdown';
+import { Dropdown } from '../../../../components/Dropdown';
 
 interface SandwichTableProps {
   weekArray: string[];
@@ -45,7 +45,6 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
     onDropdownChange(existingData);
   };
 
-
   const handleDeleteAllData = async (date: string | null) => {
     if (date == null) {
       return;
@@ -56,7 +55,6 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
     const existingData = await getSandwichSchedulesByPeriod(period);
     onDropdownChange(existingData);
   };
-
 
   // 모두 채우기 기능
   // 1. 모두 채우기 버튼을 클릭하면 전 날 데이터를 가져와서 새로운 데이터로 삽입
@@ -70,9 +68,7 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
 
     const previousDateIndex = weekArray.indexOf(date) - 1;
     const previousDate = previousDateIndex >= 0 ? weekArray[previousDateIndex] : undefined;
-    const previousData = previousDate
-      ? await getSandwichScheduleByDate(previousDate)
-      : [];
+    const previousData = previousDate ? await getSandwichScheduleByDate(previousDate) : [];
     console.log(previousData);
     if (previousData == null) {
       return;
@@ -80,7 +76,6 @@ const SandwichTable = ({ weekArray }: SandwichTableProps) => {
 
     if (previousData.length > 0) {
       const newData: Array<Tables<'sandwich_schedule'>> = previousData?.map((item) => {
-
         const nextDropdownData =
           item.dropdown_data == null
             ? '기타'

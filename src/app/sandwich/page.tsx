@@ -1,7 +1,7 @@
 'use client';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { useState, useEffect } from 'react';
-import { SandwichTable } from '@/components/SandwichTable';
+import { SandwichTable } from '@/app/sandwich/components/SandwichTable';
 
 export default function SandwichPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
