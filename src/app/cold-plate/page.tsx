@@ -159,6 +159,7 @@ export default function Home() {
     };
 
     addWorkSchedule();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(weekendArray)]);
 
   // 작업자 목록 출력

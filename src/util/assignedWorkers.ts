@@ -3,7 +3,7 @@ import { personList } from '@/constants';
 import { AssignedWorkers, WeekendArray } from '@/data/type';
 
 export const assignWorkers = (weekendArray: WeekendArray[]) => {
-  const workers: Omit<AssignedWorkers, 'id'>[] = [];
+  const workers: Array<Omit<AssignedWorkers, 'id'>> = [];
   let luckyPersonId = 0;
 
   // 주말에 대해 반복

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { sandwichColumns, sandwichRows } from '@/constants';
+import { Tables } from '@/data/supabase';
 import { supabase } from '@/supabase/supabase';
 import { makeTable } from '@/util/makeTable';
-import { Tables } from '@/data/supabase';
 
 export function useGetSanwichData(weekArray: string[]) {
-  const [dropdownData, setDropdownData] = useState<(string | null)[][]>(
+  const [dropdownData, setDropdownData] = useState<Array<Array<string | null>>>(
     makeTable(sandwichColumns.length, sandwichRows.length, { initialValue: '' }),
   );
 
