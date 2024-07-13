@@ -1,14 +1,14 @@
 'use client';
 
 import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Calendar from 'react-calendar';
+import { getWorkSchedules, insertWorkSchedule, upsertWorkSchedule } from '@/apis/workSchedule';
 import { Accordian } from '@/components/Accordian';
 import { Dropdown } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { personList } from '@/constants';
-import { AssignedWorkers, WeekendArray } from '@/data/type';
-import { supabase } from '@/supabase/supabase';
+import { AssignedWorkers } from '@/data/type';
 import { assignWorkers } from '@/util/assignedWorkers';
 import { getMonthlyWorkScheduleData } from '@/util/getMonthlyWorkScheduleData';
 import { isPastDate } from '@/util/isPastDate';
@@ -37,25 +37,13 @@ export default function Home() {
         workers: [selectedWorker1, selectedWorker2],
       };
 
-      try {
-        const { error } = await supabase.from('work_schedule').upsert(newData);
-        if (error) {
-          throw error;
-        }
+      upsertWorkSchedule(newData);
 
-        const { data: updatedData, error: updateError } = await supabase
-          .from('work_schedule')
-          .select('*');
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        setWorkScheduleData(getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate));
-      } catch (error) {
-        console.error('데이터를 업데이트하는 도중 오류가 발생했습니다:', error);
-      }
+      const updatedData = await getWorkSchedules();
+      const monthlyWorkScheduleData = getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate);
+      setWorkScheduleData(monthlyWorkScheduleData);
     }
+
     setSelectedWorker1(null);
     setSelectedWorker2(null);
     setIsModalOpen(false);
@@ -78,32 +66,21 @@ export default function Home() {
     setIsAccordianOpen3(!isAccordianOpen3);
   };
 
-  // 현재 날짜
-  const date = format(new Date(), 'yyyy-MM-dd');
-  const [value, onChange] = useState<string>(date);
+  const [selectedDate, onChange] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
 
-  // 선택한 날짜
-  const selectedDate = format(value, 'yyyy-MM-dd');
+  const [yearOfSelectedDate, monthOfSelectedDate] = selectedDate.split('-').map(Number);
 
-  // 선택한 날짜의 달
-  const yearOfSelectedDate = Number(selectedDate.split('-')[0]);
-  const monthOfSelectedDate = Number(selectedDate.split('-')[1]);
-
-  // 주말 배열
-  const weekendArray = monthOfSelectedDate
-    ? generateMonthlyWeekendArray(yearOfSelectedDate, monthOfSelectedDate)
-    : null;
-
-  // 주말에 작업자 할당
-  const assignedWorkers = assignWorkers(weekendArray as WeekendArray[]);
+  const weekendArray = useMemo(
+    () => generateMonthlyWeekendArray(yearOfSelectedDate, monthOfSelectedDate),
+    [yearOfSelectedDate, monthOfSelectedDate],
+  );
 
   // 달력 날짜 변경 & 모달창 열기
-  const handleDateChange = (_selectedDate) => {
-    const selectedDate = format(_selectedDate, 'yyyy-MM-dd');
-    onChange(selectedDate);
+  const handleDateChange = (date: Date) => {
+    onChange(format(date, 'yyyy-MM-dd'));
 
     // 주말이면서 현재나 과거 날짜가 아니면 상태 변경
-    if (isWeekend(new Date(selectedDate)) && !isPastDate(new Date(selectedDate))) {
+    if (isWeekend(date) && !isPastDate(date)) {
       setSelectedWorker1(data.find((worker) => worker.date === selectedDate)?.workers?.[0] || null);
       setSelectedWorker2(data.find((worker) => worker.date === selectedDate)?.workers?.[1] || null);
       setIsModalOpen(true);
@@ -112,55 +89,32 @@ export default function Home() {
 
   // 작업자 할당 데이터 추가
   useEffect(() => {
+    // 주말에 작업자 할당
+    const assignedWorkers = assignWorkers(weekendArray);
+
     const addWorkSchedule = async () => {
-      // work_schedule 테이블에서 기존 데이터 가져오기
-      try {
-        const { data: existingData, error } = await supabase.from('work_schedule').select('*');
+      const existingData = await getWorkSchedules();
 
-        if (error) {
-          throw error;
-        }
-
-        // 중복 데이터 확인 후 추가
-        const newData = assignedWorkers.filter((newAssignment) => {
-          // work_schedule 테이블에 해당 날짜의 데이터가 없으면 추가
-          return !existingData.some(
-            (existingAssignment) => existingAssignment.date === newAssignment.date,
-          );
+      for (const newAssignment of assignedWorkers) {
+        const isDuplicateDate = existingData.some((assignment) => {
+          return assignment.date === newAssignment.date;
         });
 
-        // 중복되지 않는 데이터만 추가
-        if (newData.length > 0) {
-          const { data: insertedData, error: insertError } = await supabase
-            .from('work_schedule')
-            .insert(newData);
-
-          if (insertError) {
-            throw insertError;
-          }
-
-          console.log('새로운 작업 일정을 Supabase에 등록했습니다:', insertedData);
-        } else {
-          console.log('추가할 작업 일정이 없습니다.');
+        if (!isDuplicateDate) {
+          await insertWorkSchedule(newAssignment);
         }
-
-        const { data: updatedData, error: updateError } = await supabase
-          .from('work_schedule')
-          .select('*');
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        setWorkScheduleData(getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate));
-      } catch (error) {
-        console.error('작업 일정을 등록하는 도중 오류가 발생했습니다:', error);
       }
+
+      const updatedData = await getWorkSchedules();
+
+      const monthlyWorkScheduleData = getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate);
+
+      setWorkScheduleData(monthlyWorkScheduleData);
     };
 
     addWorkSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(weekendArray)]);
+  }, [JSON.stringify([yearOfSelectedDate, monthOfSelectedDate])]);
 
   // 작업자 목록 출력
   const renderWorkers = () => {
@@ -181,16 +135,19 @@ export default function Home() {
   };
 
   // 특정 담당자의 작업 횟수 카운트
-  const oneWorkermentionCounts = workCounter('1번 뚜둥이', data as AssignedWorkers[]);
-  const twoWorkermentionCounts = workCounter('2번 뚜둥이', data as AssignedWorkers[]);
-  const threeWorkermentionCounts = workCounter('3번 뚜둥이', data as AssignedWorkers[]);
+  const oneWorkermentionCounts = workCounter('1번 뚜둥이', data);
+  const twoWorkermentionCounts = workCounter('2번 뚜둥이', data);
+  const threeWorkermentionCounts = workCounter('3번 뚜둥이', data);
 
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen ">
       <main className="flex flex-col gap-10 items-center justify-center flex-1 p-4">
         <Calendar
           locale="ko-KR"
-          onChange={handleDateChange}
+          value={selectedDate}
+          onChange={(value) => {
+            value instanceof Date && handleDateChange(value);
+          }}
           onActiveStartDateChange={({ activeStartDate }) => {
             if (!activeStartDate) {
               return;
@@ -198,7 +155,6 @@ export default function Home() {
 
             onChange(format(activeStartDate, 'yyyy-MM-dd'));
           }}
-          value={value}
           showNeighboringMonth={false}
           tileContent={({ date }) => {
             const parsedDate = format(date, 'yyyy-MM-dd');
