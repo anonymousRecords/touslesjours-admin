@@ -6,10 +6,6 @@ export type WeekendArray = {
   person: string[];
 };
 
-export type AssignedWorkers = Tables<'work_schedule'>;
-// export type AssignedWorkers = {
-//   date: string;
-//   workers: string[];
-// };
+export type WorkSchedule = Tables<'work_schedule'>;
 
 export type SandwichType = (typeof sandwichColumns)[number];

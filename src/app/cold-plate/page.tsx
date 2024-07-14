@@ -8,13 +8,13 @@ import { Accordian } from '@/components/Accordian';
 import { Dropdown } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { personList } from '@/constants';
-import { AssignedWorkers } from '@/data/type';
+import { WorkSchedule } from '@/data/type';
 import { assignWorkers } from '@/util/assignedWorkers';
-import { getMonthlyWorkScheduleData } from '@/util/getMonthlyWorkScheduleData';
+import getMetionCount from '@/util/getMetionCount';
+import { getMonthlyWorkSchedules } from '@/util/getMonthlyWorkScheduleData';
 import { isPastDate } from '@/util/isPastDate';
 import { isWeekend } from '@/util/isWeekend';
 import { generateMonthlyWeekendArray } from '@/util/weekendArrayGenerator';
-import workCounter from '@/util/workCounter';
 
 import 'react-calendar/dist/Calendar.css';
 
@@ -23,13 +23,13 @@ const dropdownContents = ['1번 뚜둥이', '2번 뚜둥이', '3번 뚜둥이'];
 export default function Home() {
   const [selectedWorker1, setSelectedWorker1] = useState<string | null>(null);
   const [selectedWorker2, setSelectedWorker2] = useState<string | null>(null);
-  const [data, setWorkScheduleData] = useState<AssignedWorkers[]>([]);
+  const [workScheduleData, setWorkScheduleData] = useState<WorkSchedule[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 저장하기 버튼 클릭 시 실행되는 함수
   const handleSaveClick = async () => {
     // selectedDate로 선택한 날짜의 데이터를 가져와서 수정
-    const selectedData = data.find((worker) => worker.date === selectedDate);
+    const selectedData = workScheduleData.find((worker) => worker.date === selectedDate);
 
     if (selectedData && selectedWorker1 && selectedWorker2) {
       const newData = {
@@ -40,7 +40,7 @@ export default function Home() {
       upsertWorkSchedule(newData);
 
       const updatedData = await getWorkSchedules();
-      const monthlyWorkScheduleData = getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate);
+      const monthlyWorkScheduleData = getMonthlyWorkSchedules(updatedData, monthOfSelectedDate);
       setWorkScheduleData(monthlyWorkScheduleData);
     }
 
@@ -81,8 +81,12 @@ export default function Home() {
 
     // 주말이면서 현재나 과거 날짜가 아니면 상태 변경
     if (isWeekend(date) && !isPastDate(date)) {
-      setSelectedWorker1(data.find((worker) => worker.date === selectedDate)?.workers?.[0] || null);
-      setSelectedWorker2(data.find((worker) => worker.date === selectedDate)?.workers?.[1] || null);
+      setSelectedWorker1(
+        workScheduleData.find((worker) => worker.date === selectedDate)?.workers?.[0] || null,
+      );
+      setSelectedWorker2(
+        workScheduleData.find((worker) => worker.date === selectedDate)?.workers?.[1] || null,
+      );
       setIsModalOpen(true);
     }
   };
@@ -107,7 +111,7 @@ export default function Home() {
 
       const updatedData = await getWorkSchedules();
 
-      const monthlyWorkScheduleData = getMonthlyWorkScheduleData(updatedData, monthOfSelectedDate);
+      const monthlyWorkScheduleData = getMonthlyWorkSchedules(updatedData, monthOfSelectedDate);
 
       setWorkScheduleData(monthlyWorkScheduleData);
     };
@@ -118,7 +122,7 @@ export default function Home() {
 
   // 작업자 목록 출력
   const renderWorkers = () => {
-    return data.map((assignment) => {
+    return workScheduleData.map((assignment) => {
       if (!assignment.workers) {
         return null;
       }
@@ -135,9 +139,9 @@ export default function Home() {
   };
 
   // 특정 담당자의 작업 횟수 카운트
-  const oneWorkermentionCounts = workCounter('1번 뚜둥이', data);
-  const twoWorkermentionCounts = workCounter('2번 뚜둥이', data);
-  const threeWorkermentionCounts = workCounter('3번 뚜둥이', data);
+  const oneWorkermentionCounts = getMetionCount('1번 뚜둥이', workScheduleData);
+  const twoWorkermentionCounts = getMetionCount('2번 뚜둥이', workScheduleData);
+  const threeWorkermentionCounts = getMetionCount('3번 뚜둥이', workScheduleData);
 
   return (
     <div className="flex flex-col bg-gray-100 min-h-screen ">
@@ -158,24 +162,26 @@ export default function Home() {
           showNeighboringMonth={false}
           tileContent={({ date }) => {
             const parsedDate = format(date, 'yyyy-MM-dd');
-            for (let i = 0; i < data.length; i++) {
-              if (parsedDate === data[i].date) {
+            for (let i = 0; i < workScheduleData.length; i++) {
+              if (parsedDate === workScheduleData[i].date) {
                 return (
                   <div className="flex gap-1">
                     <div
                       className="rounded-full w-4 h-4"
                       style={{
                         backgroundColor:
-                          personList.find((person) => person.name === data[i].workers?.[0])
-                            ?.color || 'transparent',
+                          personList.find(
+                            (person) => person.name === workScheduleData[i].workers?.[0],
+                          )?.color || 'gray',
                       }}
                     ></div>
                     <div
                       className="rounded-full w-4 h-4"
                       style={{
                         backgroundColor:
-                          personList.find((person) => person.name === data[i].workers?.[1])
-                            ?.color || 'transparent',
+                          personList.find(
+                            (person) => person.name === workScheduleData[i].workers?.[1],
+                          )?.color || 'gray',
                       }}
                     ></div>
                   </div>

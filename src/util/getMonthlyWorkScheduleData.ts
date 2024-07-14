@@ -1,11 +1,11 @@
 import { getMonth } from 'date-fns';
-import { AssignedWorkers } from '@/data/type';
+import { WorkSchedule } from '@/data/type';
 
-export const getMonthlyWorkScheduleData = (
-  workScheduleData: AssignedWorkers[],
+export const getMonthlyWorkSchedules = (
+  workSchedules: WorkSchedule[],
   targetMonth: number,
-): AssignedWorkers[] => {
-  const monthlyWorkScheduleData = workScheduleData.filter((schedule) => {
+): WorkSchedule[] => {
+  const monthlyWorkSchedules = workSchedules.filter((schedule) => {
     if (!schedule.date) {
       return false;
     }
@@ -13,5 +13,5 @@ export const getMonthlyWorkScheduleData = (
     return getMonth(schedule.date) + 1 === targetMonth;
   });
 
-  return monthlyWorkScheduleData;
+  return monthlyWorkSchedules;
 };
