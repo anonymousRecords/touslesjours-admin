@@ -1,7 +1,7 @@
 'use client';
 
 import { format, isWeekend } from 'date-fns';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { getWorkSchedules, insertWorkSchedule, upsertWorkSchedule } from '@/apis/workSchedule';
 import { Accordian } from '@/components/Accordian';
@@ -9,11 +9,11 @@ import { Dropdown } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { personList } from '@/constants';
 import { WorkSchedule } from '@/data/type';
-import { assignWorkers } from '@/util/assignedWorkers';
+import { getDefaultWorkSchedule } from '@/util/getDefaultWorkSchdule';
 import getMetionCount from '@/util/getMetionCount';
 import { getMonthlyWorkSchedules } from '@/util/getMonthlyWorkScheduleData';
+import { getWeekendsInMonth } from '@/util/getWeekendsInMonth';
 import { isPastDate } from '@/util/isPastDate';
-import { generateMonthlyWeekendArray } from '@/util/weekendArrayGenerator';
 
 import 'react-calendar/dist/Calendar.css';
 import Avatar from './components/Avatar/Avatar';
@@ -70,22 +70,15 @@ export default function Home() {
 
   const [yearOfSelectedDate, monthOfSelectedDate] = selectedDate.split('-').map(Number);
 
-  const weekendArray = useMemo(
-    () => generateMonthlyWeekendArray(yearOfSelectedDate, monthOfSelectedDate),
-    [yearOfSelectedDate, monthOfSelectedDate],
-  );
-
   // 달력 날짜 변경 & 모달창 열기
-  const handleDateChange = (date: Date) => {
-    onChange(format(date, 'yyyy-MM-dd'));
-
+  const handleDateChange = (date: string) => {
     // 주말이면서 현재나 과거 날짜가 아니면 상태 변경
-    if (isWeekend(date) && !isPastDate(date)) {
+    if (isWeekend(date) && !isPastDate(new Date(date))) {
       setSelectedWorker1(
-        workSchedulesData.find((worker) => worker.date === selectedDate)?.workers?.[0] || null,
+        workSchedulesData.find((worker) => worker.date === date)?.workers?.[0] || null,
       );
       setSelectedWorker2(
-        workSchedulesData.find((worker) => worker.date === selectedDate)?.workers?.[1] || null,
+        workSchedulesData.find((worker) => worker.date === date)?.workers?.[1] || null,
       );
       setIsModalOpen(true);
     }
@@ -93,8 +86,11 @@ export default function Home() {
 
   // 작업자 할당 데이터 추가
   useEffect(() => {
-    // 주말에 작업자 할당
-    const assignedWorkers = assignWorkers(weekendArray);
+    // const weekendArray = generateMonthlyWeekendArray(yearOfSelectedDate, monthOfSelectedDate);
+
+    // // 주말에 작업자 할당
+    // const assignedWorkers = assignWorkers(weekendArray);
+    const assignedWorkers = getDefaultWorkSchedule(yearOfSelectedDate, monthOfSelectedDate);
 
     const addWorkSchedule = async () => {
       const existingData = await getWorkSchedules();
@@ -150,7 +146,11 @@ export default function Home() {
           locale="ko-KR"
           value={selectedDate}
           onChange={(value) => {
-            value instanceof Date && handleDateChange(value);
+            if (value instanceof Date) {
+              const formattedDate = format(value, 'yyyy-MM-dd');
+              onChange(formattedDate);
+              handleDateChange(formattedDate);
+            }
           }}
           onActiveStartDateChange={({ activeStartDate }) => {
             if (!activeStartDate) {
@@ -178,33 +178,6 @@ export default function Home() {
                 <Avatar backgroundColor={worker2?.color || 'lightgray'} />
               </div>
             );
-
-            // for (let i = 0; i < workScheduleData.length; i++) {
-            //   if (parsedDate === workScheduleData[i].date) {
-            //     return (
-            //       <div className="flex gap-1">
-            //         <div
-            //           className="rounded-full w-4 h-4"
-            //           style={{
-            //             backgroundColor:
-            //               personList.find(
-            //                 (person) => person.name === workScheduleData[i].workers?.[0],
-            //               )?.color || 'gray',
-            //           }}
-            //         ></div>
-            //         <div
-            //           className="rounded-full w-4 h-4"
-            //           style={{
-            //             backgroundColor:
-            //               personList.find(
-            //                 (person) => person.name === workScheduleData[i].workers?.[1],
-            //               )?.color || 'gray',
-            //           }}
-            //         ></div>
-            //       </div>
-            //     );
-            //   }
-            // }
           }}
         />
         {isModalOpen && (
@@ -239,7 +212,9 @@ export default function Home() {
             {monthOfSelectedDate}월 뚜둥이 냉판 작업
           </p>
           <p className="text-xs mb-4 text-center">
-            {monthOfSelectedDate}월달 주말은 총 {weekendArray?.length}일입니다.
+            {monthOfSelectedDate}월달 주말은 총{' '}
+            {getWeekendsInMonth(yearOfSelectedDate, monthOfSelectedDate).length}
+            일입니다.
           </p>
           <p className="text-lg font-semibold mb-2">작업 관련</p>
           <div className="flex flex-col gap-2 mb-6">
