@@ -1,14 +1,9 @@
 import type { Metadata } from 'next';
 import './styles/globals.css';
-import localFont from 'next/font/local';
 import { Suspense } from 'react';
+import { ServerNavigation } from '@/components/Navigation';
 import Loading from '@/loading';
 import AuthProvider from './context/AuthProvider';
-
-const pretendardFont = localFont({
-  src: '../fonts/PretendardVariable.woff2',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: '뚜레쥬르',
@@ -27,8 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <AuthProvider>
         <Suspense fallback={<Loading />} />
-        <body className={pretendardFont.className}>
-          <div>{children}</div>
+        <body className="flex flex-col">
+          <ServerNavigation />
+          <main>{children}</main>
         </body>
       </AuthProvider>
     </html>
