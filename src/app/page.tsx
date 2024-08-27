@@ -1,28 +1,10 @@
 import dynamic from 'next/dynamic';
-// import Link from 'next/link';
-// import { getServerSession } from 'next-auth';
-// import { options } from './api/auth/[...nextauth]/options';
 
 const ClientShaderGradient = dynamic(() => import('../components/ShaderGradient/ShaderGradient'), {
   ssr: false,
 });
 
 export default async function Home() {
-  // const session = await getServerSession(options);
-
-  // if (!session) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <p className="text-center text-gray-700">
-  //         로그인이 필요합니다.
-  //         <Link href="/auth" className="ml-2 text-[#FFBF00] hover:underline">
-  //           로그인 하기
-  //         </Link>
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="relative h-[calc(100vh-5rem)]">
       <ClientShaderGradient />
