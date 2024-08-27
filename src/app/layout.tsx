@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './styles/globals.css';
 import localFont from 'next/font/local';
 import { Suspense } from 'react';
-import { Navbar } from '@/components/Navbar';
 import Loading from '@/loading';
 import AuthProvider from './context/AuthProvider';
 
@@ -29,7 +28,6 @@ export default function RootLayout({
       <AuthProvider>
         <Suspense fallback={<Loading />} />
         <body className={pretendardFont.className}>
-          <Navbar />
           <div>{children}</div>
         </body>
       </AuthProvider>
