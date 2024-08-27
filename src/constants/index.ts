@@ -1,24 +1,35 @@
-export const navElements = [
+type NavigationItems = {
+  name: string;
+  label: string;
+  href: string;
+};
+
+export const navigationItems: NavigationItems[] = [
   {
     name: 'home',
     label: '홈',
     href: '/',
   },
   {
+    name: 'workschedule',
+    label: '근무표',
+    href: '/workschedule',
+  },
+  {
+    name: 'reservation',
+    label: '예약',
+    href: '/reservation',
+  },
+  {
     name: 'cold-plate',
     label: '냉판',
-    href: '/cold-plate',
+    href: '/coldplate',
   },
   {
     name: 'sandwich',
     label: '샌드위치 스티커',
     href: '/sandwich',
   },
-  // {
-  //   name: 'cake',
-  //   label: '케이크 예약',
-  //   href: '/cake',
-  // },
 ];
 
 export const colorsContent = ['주', '녹', '흰', '기타'];
