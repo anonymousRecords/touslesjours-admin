@@ -3,6 +3,7 @@ import './styles/globals.css';
 import { Suspense } from 'react';
 import { ServerNavigation } from '@/components/Navigation';
 import Loading from '@/loading';
+import { SupabaseProvider } from '@/utils/supabase/supabase-provider';
 import AuthProvider from './context/AuthProvider';
 
 export const metadata: Metadata = {
@@ -23,8 +24,10 @@ export default function RootLayout({
       <AuthProvider>
         <Suspense fallback={<Loading />} />
         <body className="flex flex-col">
-          <ServerNavigation />
-          <main>{children}</main>
+          <SupabaseProvider>
+            <ServerNavigation />
+            <main>{children}</main>
+          </SupabaseProvider>
         </body>
       </AuthProvider>
     </html>

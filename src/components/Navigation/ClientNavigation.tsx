@@ -3,11 +3,42 @@
 import { Dialog, DialogPanel, DialogTitle, Description } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { navigationItems } from '@/constants';
+import { useSupabase } from '@/utils/supabase/supabase-provider';
 
-function ClientNavigation({ session }) {
-  const [isOpen, setIsOpen] = useState(false);
+function ClientNavigation() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [user, setUser] = useState(null);
+  const { supabase } = useSupabase();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const { data } = await supabase.from('users').select('*').eq('username', username).single();
+
+    if (data && data.password === password) {
+      setUser(data);
+      setUsername(data.username);
+      localStorage.setItem('user', JSON.stringify(data));
+      setIsOpen(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    setIsOpen(false);
+  };
 
   return (
     <header className="h-10 p-8">
@@ -21,23 +52,54 @@ function ClientNavigation({ session }) {
             </button>
 
             <DialogTitle className="md:text-xl text-lg font-bold">
-              {session ? <p>안녕하세요 $$님</p> : <p>로그인이 필요합니다.</p>}
+              {user && <p>안녕하세요 {username}님</p>}
             </DialogTitle>
 
-            <Description className="flex flex-col gap-4 md:text-lg text-base">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="hover:text-green-600 hover:font-bold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </Description>
+            {!user ? (
+              <>
+                <DialogTitle className="md:text-xl text-lg font-bold">
+                  로그인을 해주세요
+                </DialogTitle>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="아이디"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="password"
+                    placeholder="비밀번호"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                  <button type="submit" className="w-full p-2 bg-green-600 text-white rounded">
+                    로그인
+                  </button>
+                </form>
+              </>
+            ) : (
+              <Description className="flex flex-col gap-4 md:text-lg text-base">
+                {navigationItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="hover:text-green-600 hover:font-bold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </Description>
+            )}
 
-            {session ? <button className="fixed bottom-10">로그아웃</button> : null}
+            {user && (
+              <button onClick={handleLogout} className="fixed bottom-10 p-2 text-gray-800">
+                로그아웃
+              </button>
+            )}
           </DialogPanel>
         </div>
       </Dialog>
