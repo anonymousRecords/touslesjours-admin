@@ -1,7 +1,7 @@
 'use server';
 
 import { TablesInsert, TablesUpdate } from '@/data/supabase';
-import { createClient } from '@/util/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 export const getSandwichSchedulesByPeriod = async (period: string) => {
   const supabase = createClient();
@@ -23,7 +23,7 @@ export const getSandwichScheduleByDate = async (date: string) => {
   }
 
   return data;
-}
+};
 
 export const upsertSandwichSchedule = async (
   newSandwichSchedule: TablesUpdate<'sandwich_schedule'> | TablesInsert<'sandwich_schedule'>,

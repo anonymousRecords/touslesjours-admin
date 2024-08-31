@@ -9,11 +9,11 @@ import { Dropdown } from '@/components/Dropdown';
 import { Modal } from '@/components/Modal';
 import { personList } from '@/constants';
 import { WorkSchedule } from '@/data/type';
-import { getDefaultWorkSchedule } from '@/util/getDefaultWorkSchdule';
-import getMetionCount from '@/util/getMetionCount';
-import { getMonthlyWorkSchedules } from '@/util/getMonthlyWorkScheduleData';
-import { getWeekendsInMonth } from '@/util/getWeekendsInMonth';
-import { isPastDate } from '@/util/isPastDate';
+import { getDefaultWorkSchedule } from '@/utils/getDefaultWorkSchdule';
+import getMetionCount from '@/utils/getMetionCount';
+import { getMonthlyWorkSchedules } from '@/utils/getMonthlyWorkScheduleData';
+import { getWeekendsInMonth } from '@/utils/getWeekendsInMonth';
+import { isPastDate } from '@/utils/isPastDate';
 
 import 'react-calendar/dist/Calendar.css';
 import Avatar from './components/Avatar/Avatar';

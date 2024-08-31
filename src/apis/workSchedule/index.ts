@@ -1,7 +1,7 @@
 'use server';
 
 import { TablesInsert, TablesUpdate } from '@/data/supabase';
-import { createClient } from '@/util/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 export const getWorkSchedules = async () => {
   const supabase = createClient();

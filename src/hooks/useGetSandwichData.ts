@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getSandwichSchedulesByPeriod } from '@/apis/sandwich';
 import { sandwichColumns, sandwichRows } from '@/constants';
 import { Tables } from '@/data/supabase';
-import { makeTable } from '@/util/makeTable';
+import { makeTable } from '@/utils/makeTable';
 
 export function useGetSanwichData(weekArray: string[]) {
   const [dropdownData, setDropdownData] = useState<Array<Array<string | null>>>(
