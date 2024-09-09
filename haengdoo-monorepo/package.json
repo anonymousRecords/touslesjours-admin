@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "haengdoo-main:dev": "pnpm --filter haengdoo-main dev",
+    "haengdoo-main:build": "pnpm --filter haengdoo-main build",
+    "haengdoo-main:start": "pnpm --filter haengdoo-main start",
+    "haengdoo-main:lint": "pnpm --filter haengdoo-main lint",
+    "bread-coupon-service:dev": "pnpm --filter bread-coupon-service dev",
+    "bread-coupon-service:build": "pnpm --filter bread-coupon-service build",
+    "bread-coupon-service:start": "pnpm --filter bread-coupon-service start",
+    "bread-coupon-service:lint": "pnpm --filter bread-coupon-service lint"
   },
   "keywords": [],
   "author": "",
