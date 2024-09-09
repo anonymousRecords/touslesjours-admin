@@ -1,7 +1,7 @@
 "use server";
 
+import { createClient } from 'core/src/supabase/server';
 import { WorkLog } from "../../types/types";
-import { createClient } from "../../utils/supabase/server";
 
 export const getWorkLogs = async (
   userId: number,

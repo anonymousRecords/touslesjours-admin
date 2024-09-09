@@ -1,7 +1,7 @@
 "use server";
 
+import { createClient } from 'core/src/supabase/server';
 import { UsersByShift, UserShift } from "../../types/types";
-import { createClient } from "../../utils/supabase/server";
 
 export const getUsersByShift = async (): Promise<UsersByShift> => {
   const supabase = createClient();

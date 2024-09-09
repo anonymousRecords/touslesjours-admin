@@ -1,7 +1,7 @@
 "use server";
 
+import { createClient } from 'core/src/supabase/server';
 import { WorkSchedule } from "../../types/types";
-import { createClient } from "../../utils/supabase/server";
 
 export const getWorkSchedules = async () => {
   const supabase = createClient();

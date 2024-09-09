@@ -1,14 +1,13 @@
-import type { Metadata } from "next";
-import { ServerNavigation } from "../components/Navigation";
+import { SupabaseProvider } from 'core/src/supabase/supabase-provider';
+import type { Metadata } from 'next';
+import { ServerNavigation } from '../components/Navigation';
 
-import "./global.css";
-import { SupabaseProvider } from "../utils/supabase/supabase-provider";
-
+import './global.css';
 export const metadata: Metadata = {
-  title: "뚜레쥬르",
-  description: "행복한 뚜둥이 생활을 위하여",
+  title: '뚜레쥬르',
+  description: '행복한 뚜둥이 생활을 위하여',
   icons: {
-    icon: "./favicon.ico",
+    icon: './favicon.ico',
   },
 };
 

@@ -1,7 +1,7 @@
 "use server";
 
+import { createClient } from 'core/src/supabase/server';
 import { SandwichSchedule } from "../../types/types";
-import { createClient } from "../../utils/supabase/server";
 
 export const getSandwichSchedulesByPeriod = async (
   period: string
