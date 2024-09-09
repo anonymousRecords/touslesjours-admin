@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
     "haengdoo-main:dev": "pnpm --filter haengdoo-main dev",
     "haengdoo-main:build": "pnpm --filter haengdoo-main build",
     "haengdoo-main:start": "pnpm --filter haengdoo-main start",
@@ -24,5 +27,6 @@
   "dependencies": {
     "@supabase/ssr": "0.4.0",
     "@supabase/supabase-js": "2.44.3"
-  }
+  },
+  "packageManager": "pnpm@9.9.0"
 }
