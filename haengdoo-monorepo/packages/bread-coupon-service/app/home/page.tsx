@@ -1,9 +1,9 @@
 'use client';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/common';
 import { CouponModal } from '@/components/common';
 import { DefaultLayout } from '@/components/layout';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
 
 export default function HomePage() {
   const [userName, setUserName] = useState('사용자');
@@ -40,6 +40,7 @@ export default function HomePage() {
         <div className="grid grid-cols-5 gap-10">
           {[...Array(10)].map((_, i) => (
             <svg
+              key={i}
               width="30px"
               height="30px"
               viewBox="0 0 24 24"
