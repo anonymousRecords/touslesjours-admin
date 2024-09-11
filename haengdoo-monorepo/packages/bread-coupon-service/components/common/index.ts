@@ -5,4 +5,5 @@ export { NavigationBar } from './navigation-bar';
 export { AppBar } from './app-bar';
 export type { AppBarProps } from './app-bar';
 export { CouponModal } from './coupon-modal';
-export {Dialog} from './dialog';
+export { Dialog } from './dialog';
+export { EditableField } from './editable-field';
