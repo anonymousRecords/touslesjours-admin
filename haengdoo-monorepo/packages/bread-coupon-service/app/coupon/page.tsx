@@ -35,8 +35,12 @@ export default function CouponPage() {
     setIsModalOpen(true);
   };
 
+  const validatePassword = (password: string) => {
+    return password === '1234';
+  };
+
   const handlePasswordSubmit = () => {
-    if (password === '1234' && selectedCouponId !== null) {
+    if (validatePassword(password) && selectedCouponId !== null) {
       setCoupons(
         coupons.map((coupon) =>
           coupon.id === selectedCouponId ? { ...coupon, isUsed: true } : coupon,
